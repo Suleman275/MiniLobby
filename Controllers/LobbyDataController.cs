@@ -1,40 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MiniLobby.Data;
 using MiniLobby.Dtos;
 using MiniLobby.Enums;
+using MiniLobby.Interfaces;
 using MiniLobby.Models;
 
 namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
     public class LobbyDataController : ControllerBase {
-        private readonly ApplicationDbContext _context;
+        //private readonly ApplicationDbContext _context;
+        private readonly ILobbyRepository _lobbyRepo;
+        private readonly IMembersRepository _membersRepo;
+        private readonly ILobbyDataRepository _lobbyDataRepo;
 
-        public LobbyDataController(ApplicationDbContext context) {
-            _context = context;
+        public LobbyDataController(ILobbyRepository lobbyRepository, IMembersRepository membersRepository, ILobbyDataRepository lobbyDataRepository) {
+            //_context = context;
+            _lobbyRepo = lobbyRepository;
+            _membersRepo = membersRepository;
+            _lobbyDataRepo = lobbyDataRepository;
         }
 
         [HttpGet("{Id:guid}/data")]
         public async Task<IActionResult> GetLobbyData([FromRoute] Guid Id, [FromBody] GetLobbyDataRequestDto requestDto) {
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
 
             if (lobby == null) {
                 return NotFound();
             }
 
-            var lobbyMembers = await _context.LobbyMembers.Where(m => m.CurrentLobbyId == Id).ToListAsync();
+            var lobbyMembers = await _membersRepo.GetLobbyMembers(Id);
 
             List<LobbyData> lobbyData;
 
             if (lobby.HostId == requestDto.RequestSenderId) { //is lobby host -> show all data
-                lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).ToListAsync();
+                lobbyData = await _lobbyDataRepo.GetLobbyData(Id, DataFilterOptions.Owner);
             }
             else if (lobbyMembers.Any(m => m.MemberId == requestDto.RequestSenderId)) { //is member but not host -> dont show private data
-                lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).Where(d => d.Visibility != VisibilityOptions.Private).ToListAsync();
+                lobbyData = await _lobbyDataRepo.GetLobbyData(Id, DataFilterOptions.Member);
             }
             else { //is outsider -> show only public data 
-                lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).Where(d => d.Visibility == VisibilityOptions.Public).ToListAsync();
+                lobbyData = await _lobbyDataRepo.GetLobbyData(Id, DataFilterOptions.Outsider);
             }
 
             //return Ok(lobbyData); 
@@ -51,7 +56,8 @@ namespace MiniLobby.Controllers {
                 return BadRequest("Invalid request data");
             }
 
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
+
             if (lobby == null) {
                 return NotFound();
             }
@@ -61,29 +67,7 @@ namespace MiniLobby.Controllers {
                 return Forbid("Only the lobby host can update data");
             }
 
-            var existingData = await _context.LobbyData.Where(d => d.LobbyId == Id).ToListAsync();
-
-            foreach (var key in requestDto.Data.Keys) {
-                var dataPoint = requestDto.Data[key];
-                var existingDataPoint = existingData.FirstOrDefault(d => d.Key == key);
-
-                if (existingDataPoint != null) {
-                    // Update existing data point
-                    existingDataPoint.Value = dataPoint.Value;
-                    existingDataPoint.Visibility = dataPoint.Visibility;
-                }
-                else {
-                    // Add new data point
-                    _context.LobbyData.Add(new LobbyData {
-                        LobbyId = Id,
-                        Key = key,
-                        Value = dataPoint.Value,
-                        Visibility = dataPoint.Visibility
-                    });
-                }
-            }
-
-            await _context.SaveChangesAsync();
+            await _lobbyDataRepo.UpdateLobbyData(Id, requestDto.Data);
 
             return NoContent();
         }
@@ -94,7 +78,7 @@ namespace MiniLobby.Controllers {
                 return BadRequest("Invalid request data");
             }
 
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
             if (lobby == null) {
                 return NotFound();
             }
@@ -104,16 +88,7 @@ namespace MiniLobby.Controllers {
                 return Forbid("Only the lobby host can delete data");
             }
 
-            var dataPoints = await _context.LobbyData
-                .Where(d => d.LobbyId == Id && requestDto.Keys.Contains(d.Key))
-                .ToListAsync();
-
-            if (!dataPoints.Any()) {
-                return NotFound("No data points found");
-            }
-
-            _context.LobbyData.RemoveRange(dataPoints);
-            await _context.SaveChangesAsync();
+            await _lobbyDataRepo.DeteleLobbyData(Id, requestDto.Keys);
 
             return NoContent();
         }

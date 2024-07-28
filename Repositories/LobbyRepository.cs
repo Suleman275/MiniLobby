@@ -60,5 +60,9 @@ namespace MiniLobby.Repositories {
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> DoesLobbyExist(Guid lobbyId) {
+            return await _context.Lobbies.AnyAsync(l => l.Id == lobbyId);
+        }
     }
 }
