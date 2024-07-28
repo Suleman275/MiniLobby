@@ -75,13 +75,9 @@ namespace MiniLobby.Controllers {
                 return BadRequest("Invalid request data");
             }
 
-            // Log the incoming request
-            Console.WriteLine($"LeaveLobby request for lobby Id: {Id}, requestSenderId: {requestDto.RequestSenderId}");
-
             // Check if the lobby exists
             var lobby = await _context.Lobbies.FindAsync(Id);
             if (lobby == null) {
-                Console.WriteLine("Lobby not found");
                 return NotFound("Lobby not found");
             }
 
@@ -89,9 +85,15 @@ namespace MiniLobby.Controllers {
             var existingMember = await _context.LobbyMembers
                 .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.MemberId == requestDto.RequestSenderId);
             if (existingMember == null) {
-                Console.WriteLine("User is not a member of the lobby");
                 return BadRequest("User is not a member of the lobby");
             }
+
+            // Delete member's data
+            var memberData = await _context.MemberData
+                .Where(md => md.MemberId == requestDto.RequestSenderId)
+                .ToListAsync();
+            _context.MemberData.RemoveRange(memberData);
+
 
             // Remove the member from the lobby
             _context.LobbyMembers.Remove(existingMember);

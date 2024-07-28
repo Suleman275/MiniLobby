@@ -1,37 +1,33 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Metadata;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MiniLobby.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using MiniLobby.Dtos;
-using MiniLobby.Models;
+using MiniLobby.Interfaces;
+using MiniLobby.Mappers;
 
 namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
     public class LobbiesController : ControllerBase {
-        private readonly ApplicationDbContext _context;
+        private readonly ILobbyRepository _lobbyRepo;
 
-        public LobbiesController(ApplicationDbContext context) {
-            _context = context;
+        public LobbiesController(ILobbyRepository lobbyRepo) {
+            _lobbyRepo = lobbyRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetPublicLobbies() {
-            var lobbies = await _context.Lobbies.Where(l => l.IsPrivate == false).ToListAsync();
-
-            return Ok(lobbies);
+            var lobbies = await _lobbyRepo.GetPublicLobbies();
+            return Ok(lobbies.Select(l => new LobbyResponseDto(l)));
         }
 
         [HttpGet("{Id:guid}")]
         public async Task<IActionResult> GetLobbyById([FromRoute] Guid Id) {
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
 
             if (lobby == null) { 
                 return NotFound();
             }
 
-            return Ok(new LobbyResponseDto(lobby));
+            return Ok(lobby.ToLobbyResponseDto());
         }
 
         [HttpPost]
@@ -40,25 +36,14 @@ namespace MiniLobby.Controllers {
                 return BadRequest("One or more missing parameters");
             }
 
-            var lobby = new Lobby {
-                Id = Guid.NewGuid(),
-                HostId = requestDto.RequestSenderId,
-                Name = requestDto.LobbyName,
-                MemberLimit = requestDto.MemberLimit,
-                IsPrivate = requestDto.IsPrivate,
-            };
+            var lobby = await _lobbyRepo.CreateLobby(requestDto);
 
-            await _context.Lobbies.AddAsync(lobby);
-            await _context.LobbyMembers.AddAsync(new LobbyMember {CurrentLobbyId = lobby.Id, MemberId = requestDto.RequestSenderId});
-
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetLobbyById), new { id = lobby.Id}, lobby);
+            return CreatedAtAction(nameof(GetLobbyById), new { id = lobby.Id }, lobby.ToLobbyResponseDto());
         }
 
         [HttpDelete("{Id:guid}")]
         public async Task<IActionResult> DeleteLobby([FromRoute] Guid Id, [FromBody] DeleteLobbyRequestDto requestDto) {
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
 
             if (lobby == null) {
                 return NotFound();
@@ -68,26 +53,7 @@ namespace MiniLobby.Controllers {
                 return Forbid("Only lobby host can delete lobby"); //what is the difference between forbid and unauthorized?
             }
 
-            //Delete lobby data
-            var lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).ToListAsync();
-            _context.LobbyData.RemoveRange(lobbyData);
-
-            //find lobby members
-            var lobbyMembers = await _context.LobbyMembers.Where(m => m.CurrentLobbyId == Id).ToListAsync();
-
-            //delete member data
-            foreach (var member in lobbyMembers) {
-                var memberData = await _context.MemberData.Where(md => md.MemberId == member.MemberId).ToListAsync();
-                _context.MemberData.RemoveRange(memberData);
-            }
-
-            //delete members
-            _context.LobbyMembers.RemoveRange(lobbyMembers);
-
-            //delete lobby
-            _context.Lobbies.Remove(lobby);
-
-            await _context.SaveChangesAsync();
+            await _lobbyRepo.DeleteLobby(lobby);
 
             return NoContent();
         }

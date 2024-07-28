@@ -8,10 +8,10 @@ using MiniLobby.Models;
 namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
-    public class LobbiesController_Data : ControllerBase {
+    public class LobbyDataController : ControllerBase {
         private readonly ApplicationDbContext _context;
 
-        public LobbiesController_Data(ApplicationDbContext context) {
+        public LobbyDataController(ApplicationDbContext context) {
             _context = context;
         }
 
@@ -46,7 +46,7 @@ namespace MiniLobby.Controllers {
 
 
         [HttpPut("{Id:guid}/data")]
-        public async Task<IActionResult> UpseretLobbyData([FromRoute] Guid Id, [FromBody] UpdateLobbyDataRequestDto requestDto) {
+        public async Task<IActionResult> UpseretLobbyData([FromRoute] Guid Id, [FromBody] UpdateDataRequestDto requestDto) {
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }

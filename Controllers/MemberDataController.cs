@@ -42,7 +42,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPut("{Id:guid}/members/{memberId:guid}/data")]
-        public async Task<IActionResult> UpsertMemberData([FromRoute] Guid Id, [FromRoute] Guid memberId, [FromBody] UpdateMemberDataRequestDto requestDto) {
+        public async Task<IActionResult> UpsertMemberData([FromRoute] Guid Id, [FromRoute] Guid memberId, [FromBody] UpdateDataRequestDto requestDto) {
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }
