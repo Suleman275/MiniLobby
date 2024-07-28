@@ -1,7 +1,7 @@
 ﻿namespace MiniLobby.Enums {
     public enum VisibilityOptions {
-        Public,
-        Private,
-        Member
+        Public = 0,
+        Private = 1,
+        Member = 2
     }
 }
