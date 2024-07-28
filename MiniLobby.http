@@ -1,0 +1,6 @@
+@MiniLobby_HostAddress = http://localhost:5220
+
+GET {{MiniLobby_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
