@@ -16,6 +16,7 @@ namespace MiniLobby.Data {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<LobbyData>().HasKey(e => new { e.LobbyId, e.Key});
+            modelBuilder.Entity<LobbyMember>().HasKey(e => new { e.CurrentLobbyId, e.MemberId});
             modelBuilder.Entity<MemberData>().HasKey(e => new { e.MemberId, e.Key});
         }
 

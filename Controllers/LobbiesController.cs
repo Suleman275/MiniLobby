@@ -31,7 +31,7 @@ namespace MiniLobby.Controllers {
                 return NotFound();
             }
 
-            return Ok(lobby);
+            return Ok(new LobbyResponseDto(lobby));
         }
 
         [HttpPost]
@@ -49,7 +49,7 @@ namespace MiniLobby.Controllers {
             };
 
             await _context.Lobbies.AddAsync(lobby);
-            await _context.LobbyMembers.AddAsync(new LobbyMember {CurrentLobbyId = lobby.Id, Id = requestDto.RequestSenderId});
+            await _context.LobbyMembers.AddAsync(new LobbyMember {CurrentLobbyId = lobby.Id, MemberId = requestDto.RequestSenderId});
 
             await _context.SaveChangesAsync();
 
@@ -68,7 +68,25 @@ namespace MiniLobby.Controllers {
                 return Forbid("Only lobby host can delete lobby"); //what is the difference between forbid and unauthorized?
             }
 
+            //Delete lobby data
+            var lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).ToListAsync();
+            _context.LobbyData.RemoveRange(lobbyData);
+
+            //find lobby members
+            var lobbyMembers = await _context.LobbyMembers.Where(m => m.CurrentLobbyId == Id).ToListAsync();
+
+            //delete member data
+            foreach (var member in lobbyMembers) {
+                var memberData = await _context.MemberData.Where(md => md.MemberId == member.MemberId).ToListAsync();
+                _context.MemberData.RemoveRange(memberData);
+            }
+
+            //delete members
+            _context.LobbyMembers.RemoveRange(lobbyMembers);
+
+            //delete lobby
             _context.Lobbies.Remove(lobby);
+
             await _context.SaveChangesAsync();
 
             return NoContent();

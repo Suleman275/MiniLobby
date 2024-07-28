@@ -45,14 +45,21 @@ namespace MiniLobby.Controllers {
 
             // Check if the user is already a member of the lobby
             var existingMember = await _context.LobbyMembers
-                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.Id == requestDto.RequestSenderId);
+                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.MemberId == requestDto.RequestSenderId);
             if (existingMember != null) {
                 return BadRequest("User is already a member of the lobby");
             }
 
+            // Check if the user is a member of another lobby
+            var otherLobbyMembership = await _context.LobbyMembers
+                .AnyAsync(m => m.MemberId == requestDto.RequestSenderId && m.CurrentLobbyId != Id);
+            if (otherLobbyMembership) {
+                return BadRequest("User is already a member of another lobby");
+            }
+
             // Add the new member to the lobby
             var newMember = new LobbyMember {
-                Id = requestDto.RequestSenderId,
+                MemberId = requestDto.RequestSenderId,
                 CurrentLobbyId = Id
             };
 
@@ -63,20 +70,26 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPost("{Id:guid}/leave")]
-        public async Task<IActionResult> LeaveLobby([FromRoute] Guid Id, [FromBody] LeaveLobbyRequestDto requestDto) {
+        public async Task<IActionResult> LeaveLobby([FromRoute] Guid Id, [FromBody] LeaveLobbyRequestDto requestDto) { //todo: check if is lobby host
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }
 
+            // Log the incoming request
+            Console.WriteLine($"LeaveLobby request for lobby Id: {Id}, requestSenderId: {requestDto.RequestSenderId}");
+
+            // Check if the lobby exists
             var lobby = await _context.Lobbies.FindAsync(Id);
             if (lobby == null) {
+                Console.WriteLine("Lobby not found");
                 return NotFound("Lobby not found");
             }
 
             // Check if the user is a member of the lobby
             var existingMember = await _context.LobbyMembers
-                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.Id == requestDto.RequestSenderId);
+                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.MemberId == requestDto.RequestSenderId);
             if (existingMember == null) {
+                Console.WriteLine("User is not a member of the lobby");
                 return BadRequest("User is not a member of the lobby");
             }
 
@@ -84,6 +97,7 @@ namespace MiniLobby.Controllers {
             _context.LobbyMembers.Remove(existingMember);
             await _context.SaveChangesAsync();
 
+            Console.WriteLine("User has left the lobby successfully");
             return NoContent();
         }
     }

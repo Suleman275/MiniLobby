@@ -30,7 +30,7 @@ namespace MiniLobby.Controllers {
             if (lobby.HostId == requestDto.RequestSenderId) { //is lobby host -> show all data
                 lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).ToListAsync();
             }
-            else if (lobbyMembers.Any(m => m.Id == requestDto.RequestSenderId)) { //is member but not host -> dont show private data
+            else if (lobbyMembers.Any(m => m.MemberId == requestDto.RequestSenderId)) { //is member but not host -> dont show private data
                 lobbyData = await _context.LobbyData.Where(d => d.LobbyId == Id).Where(d => d.Visibility != VisibilityOptions.Private).ToListAsync();
             }
             else { //is outsider -> show only public data 

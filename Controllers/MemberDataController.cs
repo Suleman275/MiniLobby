@@ -22,7 +22,7 @@ namespace MiniLobby.Controllers {
                 return NotFound();
             }
 
-            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.Id == memberId)) {
+            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.MemberId == memberId)) {
                 return BadRequest("This member is not a part of this lobby");
             }
 
@@ -31,7 +31,7 @@ namespace MiniLobby.Controllers {
             if (requestDto.RequestSenderId == memberId) { //owner of data -> show all 
                 memberData = await _context.MemberData.Where(md => md.MemberId == memberId).ToListAsync();
             }
-            else if (_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.Id == memberId)) { //another lobby member requesting -> hide private data
+            else if (_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.MemberId == memberId)) { //another lobby member requesting -> hide private data
                 memberData = await _context.MemberData.Where(md => md.MemberId == memberId).Where(d => d.Visibility != VisibilityOptions.Private).ToListAsync();
             }
             else { //outsider requesting -> show only public data
@@ -52,7 +52,7 @@ namespace MiniLobby.Controllers {
                 return NotFound("Lobby not found");
             }
 
-            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.Id == memberId)) {
+            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.MemberId == memberId)) {
                 return BadRequest("This member is not a part of this lobby");
             }
 
@@ -98,7 +98,7 @@ namespace MiniLobby.Controllers {
                 return NotFound("Lobby not found");
             }
 
-            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.Id == memberId)) {
+            if (!_context.LobbyMembers.Any(m => m.CurrentLobbyId == Id && m.MemberId == memberId)) {
                 return BadRequest("This member is not a part of this lobby");
             }
 
