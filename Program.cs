@@ -10,6 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<ILobbyRepository, LobbyRepository>();
 builder.Services.AddScoped<IMembersRepository, MembersRepository>();
 builder.Services.AddScoped<ILobbyDataRepository, LobbyDataRepository>();
+builder.Services.AddScoped<IMemberDataRepository, MemberDataRepository>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options => {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

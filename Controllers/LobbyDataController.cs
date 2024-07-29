@@ -19,7 +19,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpGet("{Id:guid}/data")]
-        public async Task<IActionResult> GetLobbyData([FromRoute] Guid Id, [FromBody] GetLobbyDataRequestDto requestDto) {
+        public async Task<IActionResult> GetLobbyData([FromRoute] Guid Id, [FromBody] BaseRequestDto requestDto) {
             var lobby = await _lobbyRepo.GetById(Id);
 
             if (lobby == null) {
@@ -33,7 +33,7 @@ namespace MiniLobby.Controllers {
             if (lobby.HostId == requestDto.RequestSenderId) { //is lobby host -> show all data
                 lobbyData = await _lobbyDataRepo.GetLobbyData(Id, DataFilterOptions.Owner);
             }
-            else if (lobbyMembers.Any(m => m.MemberId == requestDto.RequestSenderId)) { //is member but not host -> dont show private data
+            else if (await _membersRepo.IsMemberOfThisLobby(Id, requestDto.RequestSenderId)) { //is member but not host -> dont show private data
                 lobbyData = await _lobbyDataRepo.GetLobbyData(Id, DataFilterOptions.Member);
             }
             else { //is outsider -> show only public data 
@@ -43,7 +43,7 @@ namespace MiniLobby.Controllers {
             //return Ok(lobbyData); 
             //return Ok(lobbyData.Select(d => new LobbyDataResponseDto(d)));
             
-            var lobbyDataResponse = new LobbyDataResponseDto_Dictionary(lobbyData);
+            var lobbyDataResponse = new DataResponseDto_Dictionary(lobbyData);
             return Ok(lobbyDataResponse);
         }
 
@@ -62,7 +62,7 @@ namespace MiniLobby.Controllers {
 
             // Check if the request sender is the host
             if (lobby.HostId != requestDto.RequestSenderId) {
-                return Forbid("Only the lobby host can update data");
+                return Unauthorized("Only the lobby host can update data");
             }
 
             await _lobbyDataRepo.UpdateLobbyData(Id, requestDto.Data);

@@ -28,7 +28,7 @@ namespace MiniLobby.Repositories {
             return await _context.LobbyMembers.Where(m => m.CurrentLobbyId == lobbyId).ToListAsync();
         }
 
-        public async Task<int> GetMemberCount(Guid lobbyId) {
+        public async Task<int> GetLobbyMemberCount(Guid lobbyId) {
             return await _context.LobbyMembers.CountAsync(m => m.CurrentLobbyId == lobbyId);
         }
 
@@ -41,6 +41,10 @@ namespace MiniLobby.Repositories {
 
             _context.LobbyMembers.Remove(member);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsMemberOfThisLobby(Guid lobbyId, Guid memberId) {
+            return await _context.LobbyMembers.AnyAsync(m => m.CurrentLobbyId == lobbyId && m.MemberId == memberId);
         }
     }
 }

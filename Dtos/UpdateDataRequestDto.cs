@@ -2,9 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace MiniLobby.Dtos {
-    public class UpdateDataRequestDto {
-        [Required]
-        public Guid RequestSenderId { get; set; }
+    public class UpdateDataRequestDto : BaseRequestDto {
         public Dictionary<string, DataPoint> Data { get; set; }
     }
 }

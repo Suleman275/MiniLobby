@@ -42,7 +42,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpDelete("{Id:guid}")]
-        public async Task<IActionResult> DeleteLobby([FromRoute] Guid Id, [FromBody] DeleteLobbyRequestDto requestDto) {
+        public async Task<IActionResult> DeleteLobby([FromRoute] Guid Id, [FromBody] BaseRequestDto requestDto) {
             var lobby = await _lobbyRepo.GetById(Id);
 
             if (lobby == null) {

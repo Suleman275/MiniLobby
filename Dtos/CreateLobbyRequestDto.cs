@@ -1,10 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace MiniLobby.Dtos {
-    public class CreateLobbyRequestDto {
-        [Required]
-        public Guid RequestSenderId { get; set; }
-        
+    public class CreateLobbyRequestDto : BaseRequestDto {        
         [Required]
         public string LobbyName { get; set; }
         

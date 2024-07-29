@@ -9,13 +9,11 @@ namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
     public class MembersController : ControllerBase {
-        private readonly ApplicationDbContext _context;
         private readonly IMembersRepository _membersRepo;
         private readonly IMemberDataRepository _memberDataRepo;
         private readonly ILobbyRepository _lobbyRepo;
 
-        public MembersController(ApplicationDbContext context, IMembersRepository membersRepository, ILobbyRepository lobbyRepository, IMemberDataRepository memberDataRepository) {
-            _context = context;
+        public MembersController(IMembersRepository membersRepository, ILobbyRepository lobbyRepository, IMemberDataRepository memberDataRepository) {
             _membersRepo = membersRepository;
             _lobbyRepo = lobbyRepository;
             _memberDataRepo = memberDataRepository;
@@ -34,7 +32,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPost("{Id:guid}/join")]
-        public async Task<IActionResult> JoinLobby([FromRoute] Guid Id, [FromBody] JoinLobbyRequestDto requestDto) { //Todo : join with data
+        public async Task<IActionResult> JoinLobby([FromRoute] Guid Id, [FromBody] BaseRequestDto requestDto) { //Todo : join with data
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }
@@ -45,7 +43,7 @@ namespace MiniLobby.Controllers {
             }
 
             // Check if the member limit has been reached
-            var currentMemberCount = await _membersRepo.GetMemberCount(Id);
+            var currentMemberCount = await _membersRepo.GetLobbyMemberCount(Id);
             if (currentMemberCount >= lobby.MemberLimit) {
                 return BadRequest("Lobby member limit reached. Cannot Join Lobby");
             }
@@ -69,7 +67,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPost("{Id:guid}/leave")]
-        public async Task<IActionResult> LeaveLobby([FromRoute] Guid Id, [FromBody] LeaveLobbyRequestDto requestDto) { //todo: check if is lobby host
+        public async Task<IActionResult> LeaveLobby([FromRoute] Guid Id, [FromBody] BaseRequestDto requestDto) { //todo: check if is lobby host
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }
@@ -90,7 +88,7 @@ namespace MiniLobby.Controllers {
                 return BadRequest("User is not a member of the lobby");
             }
 
-            await _memberDataRepo.DeleteMemberData(requestDto.RequestSenderId);
+            await _memberDataRepo.DeleteAllMemberData(requestDto.RequestSenderId);
 
             await _membersRepo.RemoveMemberFromLobby(Id, requestDto.RequestSenderId);
 
