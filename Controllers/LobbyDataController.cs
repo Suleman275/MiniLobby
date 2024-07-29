@@ -8,13 +8,11 @@ namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
     public class LobbyDataController : ControllerBase {
-        //private readonly ApplicationDbContext _context;
         private readonly ILobbyRepository _lobbyRepo;
         private readonly IMembersRepository _membersRepo;
         private readonly ILobbyDataRepository _lobbyDataRepo;
 
         public LobbyDataController(ILobbyRepository lobbyRepository, IMembersRepository membersRepository, ILobbyDataRepository lobbyDataRepository) {
-            //_context = context;
             _lobbyRepo = lobbyRepository;
             _membersRepo = membersRepository;
             _lobbyDataRepo = lobbyDataRepository;

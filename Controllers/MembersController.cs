@@ -2,25 +2,32 @@
 using Microsoft.EntityFrameworkCore;
 using MiniLobby.Data;
 using MiniLobby.Dtos;
+using MiniLobby.Interfaces;
 using MiniLobby.Models;
 
 namespace MiniLobby.Controllers {
     [Route("api/lobbies")]
     [ApiController]
-    public class LobbiesController_Members : ControllerBase {
+    public class MembersController : ControllerBase {
         private readonly ApplicationDbContext _context;
+        private readonly IMembersRepository _membersRepo;
+        private readonly IMemberDataRepository _memberDataRepo;
+        private readonly ILobbyRepository _lobbyRepo;
 
-        public LobbiesController_Members(ApplicationDbContext context) {
+        public MembersController(ApplicationDbContext context, IMembersRepository membersRepository, ILobbyRepository lobbyRepository, IMemberDataRepository memberDataRepository) {
             _context = context;
+            _membersRepo = membersRepository;
+            _lobbyRepo = lobbyRepository;
+            _memberDataRepo = memberDataRepository;
         }
 
         [HttpGet("{Id:guid}/members")]
         public async Task<IActionResult> GetLobbyMembers([FromRoute] Guid Id) {
-            if (!_context.Lobbies.Any(l => l.Id == Id)) {
+            if (!await _lobbyRepo.DoesLobbyExist(Id)) {
                 return NotFound();
             }
 
-            var lobbyMembers = await _context.LobbyMembers.Where(m => m.CurrentLobbyId == Id).ToListAsync();
+            var lobbyMembers = await _membersRepo.GetLobbyMembers(Id);
 
             //return Ok(lobbyMembers);
             return Ok(lobbyMembers.Select(m => new LobbyMemberResponseDto(m)));
@@ -32,39 +39,31 @@ namespace MiniLobby.Controllers {
                 return BadRequest("Invalid request data");
             }
 
-            var lobby = await _context.Lobbies.FindAsync(Id);
+            var lobby = await _lobbyRepo.GetById(Id);
             if (lobby == null) {
                 return NotFound("Lobby not found");
             }
 
             // Check if the member limit has been reached
-            var currentMemberCount = await _context.LobbyMembers.CountAsync(m => m.CurrentLobbyId == Id);
+            var currentMemberCount = await _membersRepo.GetMemberCount(Id);
             if (currentMemberCount >= lobby.MemberLimit) {
                 return BadRequest("Lobby member limit reached. Cannot Join Lobby");
             }
 
             // Check if the user is already a member of the lobby
-            var existingMember = await _context.LobbyMembers
-                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.MemberId == requestDto.RequestSenderId);
+            var existingMember = await _membersRepo.GetLobbyMember(Id, requestDto.RequestSenderId);
             if (existingMember != null) {
                 return BadRequest("User is already a member of the lobby");
             }
 
             // Check if the user is a member of another lobby
-            var otherLobbyMembership = await _context.LobbyMembers
-                .AnyAsync(m => m.MemberId == requestDto.RequestSenderId && m.CurrentLobbyId != Id);
+            var otherLobbyMembership = await _membersRepo.IsMemberOfOtherLobby(Id, requestDto.RequestSenderId);
             if (otherLobbyMembership) {
                 return BadRequest("User is already a member of another lobby");
             }
 
             // Add the new member to the lobby
-            var newMember = new LobbyMember {
-                MemberId = requestDto.RequestSenderId,
-                CurrentLobbyId = Id
-            };
-
-            await _context.LobbyMembers.AddAsync(newMember);
-            await _context.SaveChangesAsync();
+            await _membersRepo.AddMemberToLobby(Id, requestDto.RequestSenderId);
 
             return Ok("Joined Lobby Successfully");
         }
@@ -76,30 +75,25 @@ namespace MiniLobby.Controllers {
             }
 
             // Check if the lobby exists
-            var lobby = await _context.Lobbies.FindAsync(Id);
-            if (lobby == null) {
+            //var lobby = await _context.Lobbies.FindAsync(Id);
+            //if (lobby == null) {
+            //    return NotFound("Lobby not found");
+            //}
+
+            if (!await _lobbyRepo.DoesLobbyExist(Id)) {
                 return NotFound("Lobby not found");
             }
 
             // Check if the user is a member of the lobby
-            var existingMember = await _context.LobbyMembers
-                .FirstOrDefaultAsync(m => m.CurrentLobbyId == Id && m.MemberId == requestDto.RequestSenderId);
+            var existingMember = await _membersRepo.GetLobbyMember(Id, requestDto.RequestSenderId);
             if (existingMember == null) {
                 return BadRequest("User is not a member of the lobby");
             }
 
-            // Delete member's data
-            var memberData = await _context.MemberData
-                .Where(md => md.MemberId == requestDto.RequestSenderId)
-                .ToListAsync();
-            _context.MemberData.RemoveRange(memberData);
+            await _memberDataRepo.DeleteMemberData(requestDto.RequestSenderId);
 
+            await _membersRepo.RemoveMemberFromLobby(Id, requestDto.RequestSenderId);
 
-            // Remove the member from the lobby
-            _context.LobbyMembers.Remove(existingMember);
-            await _context.SaveChangesAsync();
-
-            Console.WriteLine("User has left the lobby successfully");
             return NoContent();
         }
     }
