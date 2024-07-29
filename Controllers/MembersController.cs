@@ -72,13 +72,8 @@ namespace MiniLobby.Controllers {
                 return BadRequest("Invalid request data");
             }
 
-            // Check if the lobby exists
-            //var lobby = await _context.Lobbies.FindAsync(Id);
-            //if (lobby == null) {
-            //    return NotFound("Lobby not found");
-            //}
-
-            if (!await _lobbyRepo.DoesLobbyExist(Id)) {
+            var lobby = await _lobbyRepo.GetById(Id);
+            if (lobby == null) {
                 return NotFound("Lobby not found");
             }
 
@@ -88,10 +83,31 @@ namespace MiniLobby.Controllers {
                 return BadRequest("User is not a member of the lobby");
             }
 
-            await _memberDataRepo.DeleteAllMemberData(requestDto.RequestSenderId);
+            if (requestDto.RequestSenderId == lobby.HostId) {
+                if (!lobby.IsHostMigrationEnabled) {
+                    await _lobbyRepo.DeleteLobby(lobby);
+                }
+                else {
+                    var members = await _membersRepo.GetLobbyMembers(Id);
+                    var otherMembers = members.Where(m => m.MemberId != requestDto.RequestSenderId).ToList();
 
-            await _membersRepo.RemoveMemberFromLobby(Id, requestDto.RequestSenderId);
+                    if (otherMembers.Any()) {
+                        // Select a new host at random
+                        var newHost = otherMembers[new Random().Next(otherMembers.Count)];
 
+                        // Update the lobby with the new host
+                        lobby.HostId = newHost.MemberId;
+                        await _lobbyRepo.UpdateLobby(lobby);
+                    }
+                    else {
+                        // No other members in the lobby, delete the lobby
+                        await _lobbyRepo.DeleteLobby(lobby);
+                    }
+                }
+            } else {
+                await _memberDataRepo.DeleteAllMemberData(requestDto.RequestSenderId);
+                await _membersRepo.RemoveMemberFromLobby(Id, requestDto.RequestSenderId);
+            }
             return NoContent();
         }
     }

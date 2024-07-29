@@ -10,5 +10,7 @@ namespace MiniLobby.Dtos {
         public int MemberLimit { get; set; }
         
         public bool IsPrivate { get; set; }
+
+        public bool IsHostMigrationEnabled { get; set; }
     }
 }

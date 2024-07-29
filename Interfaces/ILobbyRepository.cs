@@ -10,6 +10,7 @@ namespace MiniLobby.Interfaces {
         public Task<Lobby> CreateLobby(CreateLobbyRequestDto requestDto);
 
         public Task DeleteLobby(Lobby lobby);
+        public Task UpdateLobby(Lobby lobby);
 
         public Task<bool> DoesLobbyExist(Guid lobbyId);
     }
