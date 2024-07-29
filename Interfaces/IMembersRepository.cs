@@ -1,4 +1,5 @@
-﻿using MiniLobby.Models;
+﻿using MiniLobby.Misc;
+using MiniLobby.Models;
 
 namespace MiniLobby.Interfaces {
     public interface IMembersRepository {
@@ -10,7 +11,7 @@ namespace MiniLobby.Interfaces {
         public Task<bool> IsMemberOfOtherLobby(Guid excludedLobbyId, Guid memberId);
         public Task<bool> IsMemberOfThisLobby(Guid lobbyId, Guid memberId);
 
-        public Task AddMemberToLobby(Guid lobbyId, Guid memberId);
+        public Task AddMemberToLobby(Guid lobbyId, Guid memberId, Dictionary<string, DataPoint> data);
         public Task RemoveMemberFromLobby(Guid lobbyId, Guid memberId);
 
     }

@@ -32,7 +32,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPost("{Id:guid}/join")]
-        public async Task<IActionResult> JoinLobby([FromRoute] Guid Id, [FromBody] BaseRequestDto requestDto) { //Todo : join with data
+        public async Task<IActionResult> JoinLobby([FromRoute] Guid Id, [FromBody] JoinLobbyRequestDto requestDto) {
             if (!ModelState.IsValid) {
                 return BadRequest("Invalid request data");
             }
@@ -61,7 +61,7 @@ namespace MiniLobby.Controllers {
             }
 
             // Add the new member to the lobby
-            await _membersRepo.AddMemberToLobby(Id, requestDto.RequestSenderId);
+            await _membersRepo.AddMemberToLobby(Id, requestDto.RequestSenderId, requestDto.Data);
 
             return Ok("Joined Lobby Successfully");
         }

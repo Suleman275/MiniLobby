@@ -31,7 +31,7 @@ namespace MiniLobby.Controllers {
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateLobby([FromBody] CreateLobbyRequestDto requestDto) { //Todo : Create with data
+        public async Task<IActionResult> CreateLobby([FromBody] CreateLobbyRequestDto requestDto) {
             if (!ModelState.IsValid) {
                 return BadRequest("One or more missing parameters");
             }

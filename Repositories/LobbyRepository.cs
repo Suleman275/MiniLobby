@@ -33,6 +33,18 @@ namespace MiniLobby.Repositories {
             await _context.Lobbies.AddAsync(lobby);
             await _context.LobbyMembers.AddAsync(new LobbyMember { CurrentLobbyId = lobby.Id, MemberId = requestDto.RequestSenderId });
 
+            if (requestDto.Data != null && requestDto.Data.Any()) {
+                foreach (var kvp in requestDto.Data) {
+                    var lobbyData = new LobbyData {
+                        LobbyId = lobby.Id,
+                        Key = kvp.Key,
+                        Value = kvp.Value.Value,
+                        Visibility = kvp.Value.Visibility
+                    };
+                    await _context.LobbyData.AddAsync(lobbyData);
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return lobby;

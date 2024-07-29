@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MiniLobby.Data;
 using MiniLobby.Interfaces;
+using MiniLobby.Misc;
 using MiniLobby.Models;
 
 namespace MiniLobby.Repositories {
@@ -10,13 +11,25 @@ namespace MiniLobby.Repositories {
             _context = context;
         }
 
-        public async Task AddMemberToLobby(Guid lobbyId, Guid memberId) {
+        public async Task AddMemberToLobby(Guid lobbyId, Guid memberId, Dictionary<string, DataPoint> data) {
             var newMember = new LobbyMember {
                 MemberId = memberId,
                 CurrentLobbyId = lobbyId
             };
 
             await _context.LobbyMembers.AddAsync(newMember);
+
+            if (data != null && data.Any()) {
+                foreach (var kvp in data) {
+                    var memberData = new MemberData {
+                        MemberId = memberId,
+                        Key = kvp.Key,
+                        Value = kvp.Value.Value,
+                        Visibility = kvp.Value.Visibility
+                    };
+                    await _context.MemberData.AddAsync(memberData);
+                }
+            }
             await _context.SaveChangesAsync();
         }
 
