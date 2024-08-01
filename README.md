@@ -60,7 +60,7 @@ The project includes a Postman test collection and environment to facilitate API
 
 3. Run the requests:
     - Select the imported collection and then a request.
-    - Click on `Run` to execute your chosen request.
+    - Click on `Send` to execute your chosen request.
 
 ## Contributing
 
