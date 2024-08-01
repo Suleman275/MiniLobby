@@ -83,7 +83,7 @@ namespace MiniLobby.Controllers {
 
             // Check if the request sender is the host
             if (lobby.HostId != requestDto.RequestSenderId) {
-                return Forbid("Only the lobby host can delete data");
+                return Unauthorized("Only the lobby host can delete data");
             }
 
             await _lobbyDataRepo.DeteleLobbyData(Id, requestDto.Keys);
