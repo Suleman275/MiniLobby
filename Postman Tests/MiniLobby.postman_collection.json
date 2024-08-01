@@ -1,0 +1,457 @@
+{
+	"info": {
+		"_postman_id": "250a6be5-254f-4266-84e9-b056600fd776",
+		"name": "MiniLobby",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28411177"
+	},
+	"item": [
+		{
+			"name": "GetPublicLobbies",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLobbyById",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateLobby",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"requestSenderId\" : \"42504137-f833-41bd-bbd9-c9c03fdc948e\",\r\n\"lobbyName\": \"test\",\r\n\"memberLimit\": 7,\r\n\"isPrivate\": false}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteLobby",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/b7783faf-b14c-40f9-b23f-9dfc376beb29",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"b7783faf-b14c-40f9-b23f-9dfc376beb29"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLobbyData",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteLobbyData",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\",\r\n    \"keys\": [\"key3\"]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateLobbyData",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\",\r\n    \"data\": {\r\n        \"key1\": {\r\n            \"value\": \"newValue1\",\r\n            \"visibility\": 0\r\n        },\r\n        \"key2\": {\r\n            \"value\": \"newValue2\",\r\n            \"visibility\": 1\r\n        },\r\n        \"key3\": {\r\n            \"value\": \"newValue3\",\r\n            \"visibility\": 2\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLobbyMembers",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/members",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"members"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JoinLobby",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504135-f843-41bd-bbd9-c9c03fdc948e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/join",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"join"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LeaveLobby",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504135-f843-41bd-bbd9-c9c03fdc948e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/leave",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"leave"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetMemberData",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/members/{{memberId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"members",
+						"{{memberId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "UpdateMemberData",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504135-f843-41bd-bbd9-c9c03fdc948e\",\r\n    \"data\": {\r\n        \"key4\": {\r\n            \"value\": \"newValue1\",\r\n            \"visibility\": 0\r\n        },\r\n        \"key5\": {\r\n            \"value\": \"newValue2\",\r\n            \"visibility\": 1\r\n        },\r\n        \"key6\": {\r\n            \"value\": \"newValue3\",\r\n            \"visibility\": 2\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/members/{{memberId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"members",
+						"{{memberId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DeleteMemberData",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504135-f843-41bd-bbd9-c9c03fdc948e\",\r\n    \"keys\": [\"key4\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/members/{{memberId}}/data",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"members",
+						"{{memberId}}",
+						"data"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetCompleteLobby",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"requestSenderId\": \"42504137-f833-41bd-bbd9-c9c03fdc948e\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5220/api/lobbies/{{lobbyId}}/full",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5220",
+					"path": [
+						"api",
+						"lobbies",
+						"{{lobbyId}}",
+						"full"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
