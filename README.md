@@ -46,7 +46,7 @@ MiniLobby is a .NET Core Web API project designed to manage lobby systems for mu
 
 ## Testing
 
-The project includes a Postman test collection and environment to facilitate API testing. You can find these files in the `tests` folder.
+The project includes a Postman test collection and environment to facilitate API testing. You can find these files in the `Postman Tests` folder.
 
 ### Running Tests
 
