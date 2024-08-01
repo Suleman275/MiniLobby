@@ -43,7 +43,7 @@ MiniLobby is a .NET Core Web API project designed to manage lobby systems for mu
     dotnet watch run
     ```
 
-##Testing
+## Testing
 
 ## Contributing
 
