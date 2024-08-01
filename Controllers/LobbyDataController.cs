@@ -26,7 +26,7 @@ namespace MiniLobby.Controllers {
                 return NotFound();
             }
 
-            var lobbyMembers = await _membersRepo.GetLobbyMembers(Id);
+            //var lobbyMembers = await _membersRepo.GetLobbyMembers(Id);
 
             List<LobbyData> lobbyData;
 
