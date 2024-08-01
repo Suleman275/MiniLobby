@@ -7,8 +7,9 @@ MiniLobby is a .NET Core Web API project designed to manage lobby systems for mu
 - **Lobby Management**: Create and delete (only host) lobbies.
 - **Lobby Data Management**: Update and delete lobby data. (only host)
 - **Member Management**: Join or leave a lobby.
-- **Member Data Management**: Update and delete member data.
+- **Member Data Management**: Update and delete member data. (data owner)
 - **Data Visibility Options**: Member or lobby data can be marked as Public, Private, or Member, so data is filtered depending on the requester.
+- **Host Migration**: If host migration is enabled for a lobby, then on the host leaving, another is chosen at random (if available).
 - **Controllers and Repositories**: Clean separation of concerns with controllers managing HTTP requests and repositories handling data operations.
 
 ## Technologies Used
