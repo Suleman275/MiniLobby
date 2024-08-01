@@ -12,19 +12,39 @@ namespace MiniLobby.Repositories {
             _context = context;
         }
 
+        //public async Task<List<LobbyData>> GetLobbyData(Guid lobbyId, DataFilterOptions filterOptions) {
+        //    var query =  _context.LobbyData.Where(d => d.LobbyId == lobbyId);
+
+        //    switch (filterOptions) { 
+        //        case DataFilterOptions.Owner:
+        //            return await query.ToListAsync();
+        //        case DataFilterOptions.Member:
+        //            return await query.Where(d => d.Visibility != VisibilityOptions.Private).ToListAsync();
+        //        case DataFilterOptions.Outsider:
+        //            return await query.Where(d => d.Visibility == VisibilityOptions.Public).ToListAsync();
+        //        default:
+        //            return await query.Where(d => d.Visibility == VisibilityOptions.Public).ToListAsync();
+        //    }
+        //}
+        
         public async Task<List<LobbyData>> GetLobbyData(Guid lobbyId, DataFilterOptions filterOptions) {
             var query =  _context.LobbyData.Where(d => d.LobbyId == lobbyId);
 
             switch (filterOptions) { 
                 case DataFilterOptions.Owner:
-                    return await query.ToListAsync();
+                    break;
                 case DataFilterOptions.Member:
-                    return await query.Where(d => d.Visibility != VisibilityOptions.Private).ToListAsync();
+                    query = query.Where(d => d.Visibility != VisibilityOptions.Private);
+                    break;
                 case DataFilterOptions.Outsider:
-                    return await query.Where(d => d.Visibility == VisibilityOptions.Public).ToListAsync();
+                    query = query.Where(d => d.Visibility == VisibilityOptions.Public);
+                    break;
                 default:
-                    return await query.Where(d => d.Visibility == VisibilityOptions.Public).ToListAsync();
+                    query = query.Where(d => d.Visibility == VisibilityOptions.Public);
+                    break;
             }
+
+            return await query.ToListAsync();
         }
 
         public async Task UpdateLobbyData(Guid lobbyId, Dictionary<string, DataPoint> data) {

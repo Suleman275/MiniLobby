@@ -26,8 +26,6 @@ namespace MiniLobby.Controllers {
                 return NotFound();
             }
 
-            //var lobbyMembers = await _membersRepo.GetLobbyMembers(Id);
-
             List<LobbyData> lobbyData;
 
             if (lobby.HostId == requestDto.RequestSenderId) { //is lobby host -> show all data
